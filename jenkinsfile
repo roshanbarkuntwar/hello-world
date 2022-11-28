@@ -39,10 +39,10 @@ ADD webapp.war /usr/local/tomcat/webapps/
 CMD ["catalina.sh", "run"]
 EXPOSE 8080
 EOT
-sudo docker build -t webimage:$BUILD_NUMBER .
-sudo docker login -u roshanbarkuntwar -p Roshan@12345
-sudo docker tag webimage:$BUILD_NUMBER roshanbarkuntwar/tomcat:$BUILD_NUMBER
-sudo docker push roshanbarkuntwar/tomcat:$BUILD_NUMBER
+docker build -t webimage:$BUILD_NUMBER .
+docker login -u roshanbarkuntwar -p Roshan@12345
+docker tag webimage:$BUILD_NUMBER roshanbarkuntwar/tomcat:$BUILD_NUMBER
+docker push roshanbarkuntwar/tomcat:$BUILD_NUMBER
 #sudo docker container run -itd --name webserver$BUILD_NUMBER -p 8080 webimage:$BUILD_NUMBER'''
             }
         }
