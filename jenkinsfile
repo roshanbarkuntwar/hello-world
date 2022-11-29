@@ -25,7 +25,7 @@ pipeline{
                 sh 'mvn package'
             }
         } 
-        stage ('deploy') {
+        stage ('Deploy') {
             agent any
       steps {
         script {
