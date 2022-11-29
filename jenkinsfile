@@ -24,7 +24,13 @@ pipeline{
             steps{
                 sh 'mvn package'
             }
-        }
+        } 
+        stage ('deploy') {
+      steps {
+        script {
+          deploy adapters: [tomcat9(credentialsId: 'tomcat_credential', path: '', url: 'http://localhost:8090/')], contextPath: '/pipeline', onFailure: false, war: 'webapp/target/*.war' 
+            }
+         }   
         stage('deploy'){
             agent any
             steps{
@@ -44,7 +50,8 @@ docker login -u roshanbarkuntwar -p Roshan@12345
 docker tag webimage:$BUILD_NUMBER roshanbarkuntwar/tomcat:$BUILD_NUMBER
 docker push roshanbarkuntwar/tomcat:$BUILD_NUMBER
 #sudo docker container run -itd --name webserver$BUILD_NUMBER -p 8080 webimage:$BUILD_NUMBER'''
-            }
-        }
+             }
+          }
+       }
     }
 }
