@@ -1,50 +1,27 @@
-pipeline{
-    agent none
-    stages{
-        stage('gitclone'){
-            agent any
+
+pipeline {
+    agent any
+    environment {
+        PATH = "/c/apache-maven-3.8.6-bin:$PATH" 
+    }
+    stages {
+        stage("clone code"){
             steps{
-                git credentialsId: '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', url: 'https://github.com/roshanbarkuntwar/hello-world.git'
-            }
-        }
-        stage('compile'){
-            agent any
-            steps{
-                sh 'mvn compile'
-            }
-        }
-        stage('test'){
-            agent any
-            steps{
-                sh 'mvn test'
-            }
-        }
-        stage('package'){
-            agent any
-            steps{
-                sh 'mvn package'
+               git credentialsId: 'git_credentials', url: 'https://github.com/roshanbarkuntwar/hello-world.git'
             }
         }    
-        stage('deploy'){
-            agent any
+        stage("build code"){
             steps{
-                sh label: '', script: '''rm -rf dockerimg
-mkdir dockerimg
-cd dockerimg
-cp /var/jenkins_home/workspace/demo/webapp/target/*.war .
-touch dockerfile
-cat <<EOT>>dockerfile
-FROM tomcat
-ADD webapp.war /usr/local/tomcat/webapps/
-CMD ["catalina.sh", "run"]
-EXPOSE 8080
-EOT
-docker build -t webimage:$BUILD_NUMBER .
-docker login -u roshanbarkuntwar -p Roshan@12345
-docker tag webimage:$BUILD_NUMBER roshanbarkuntwar/tomcat:$BUILD_NUMBER
-docker push roshanbarkuntwar/tomcat:$BUILD_NUMBER
-#sudo docker container run -itd --name webserver$BUILD_NUMBER -p 8080 webimage:$BUILD_NUMBER'''
-             }
-          }
-      } 
-   }
+              sh "mvn clean install"
+            }
+        }
+        stage("deploy"){
+            steps{
+              sshagent(['deploy_user']){
+                     sh "scp -o StrictHostKeyChecking=no webapp/target/webapp.war ec2-user@13.212.6.248:/root/apache-tomcat-9.0.69/webapps"
+                     
+                    }
+                }
+            }
+        }
+    }
