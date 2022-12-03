@@ -14,9 +14,13 @@ pipeline{
         }
         stage('Build') {
             steps {
-            sh 'mvn clean install -f webapp/pom.xml'
-           
-                
+                sh 'mvn clean install -f webapp/pom.xml'
+            }        
+            post{
+                success{
+                    echo "Archiving the Artifacts"
+                    archiveArtifacts artifacts: "**/target/*.war"
+                }
             }
         }        
         stage('Deploy') {
